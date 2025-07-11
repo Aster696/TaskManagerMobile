@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IonToolbar } from "@ionic/angular/standalone";
 import { TaskService } from 'src/app/services/task/task.service';
+import { Task } from '../../services/task/task.service';
 
 @Component({
     selector: 'app-home',
@@ -17,15 +17,23 @@ export class HomeComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 20; i++) {
             this.items.push(i)
         }
+        console.log(this.items)
+        // this.getTasks()
     }
 
-    loadMore(event: any) {
-        setTimeout(() => {
-            this.items.push()
-        }, 1000);
+    getTasks() {
+        console.log(this.taskService.getTasks(), 'data')
     }
 
+    addTask() {
+        let task: Task = {
+            taskName: 'Aster',
+            description: 'Desc',
+            date_time: '11-07-2025'
+        }
+        this.taskService.addTask(task)
+    }
 }

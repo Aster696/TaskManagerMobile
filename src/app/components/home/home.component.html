@@ -1,5 +1,5 @@
 <ion-fab horizontal="end" vertical="bottom" slot="fixed">
-    <ion-fab-button>
+    <ion-fab-button (click)="addTask()">
         <ion-icon name="add"></ion-icon>
     </ion-fab-button>
 </ion-fab>
@@ -7,10 +7,10 @@
 <div class="accordion-s">
     <ion-accordion-group>
         @for (item of items; track item; let index = $index) {
-        <ion-accordion *ngFor="let item of items; index as i" [value]="item">
+        <ion-accordion [value]="item">
             <ion-item slot="header" lines="none">
                 <ion-label>
-                    Firt accordian
+                    Firt accordian {{index + 1}}
                 </ion-label>
             </ion-item>
             <div slot="content">

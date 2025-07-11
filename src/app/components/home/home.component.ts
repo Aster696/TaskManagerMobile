@@ -24,16 +24,18 @@ export class HomeComponent implements OnInit {
         // this.getTasks()
     }
 
-    getTasks() {
-        console.log(this.taskService.getTasks(), 'data')
+    async getTasks() {
+        this.items = await this.taskService.getTasks()
+        console.log(this.items, 'data')
     }
 
-    addTask() {
+    async addTask() {
         let task: Task = {
             taskName: 'Aster',
             description: 'Desc',
             date_time: '11-07-2025'
         }
-        this.taskService.addTask(task)
+        await this.taskService.addTask(task)
+        this.getTasks();
     }
 }

@@ -1,1 +1,22 @@
-hi
+<ion-fab horizontal="end" vertical="bottom" slot="fixed">
+    <ion-fab-button>
+        <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+</ion-fab>
+
+<div class="accordion-s">
+    <ion-accordion-group>
+        @for (item of items; track item; let index = $index) {
+        <ion-accordion *ngFor="let item of items; index as i" [value]="item">
+            <ion-item slot="header" lines="none">
+                <ion-label>
+                    Firt accordian
+                </ion-label>
+            </ion-item>
+            <div slot="content">
+                first content
+            </div>
+        </ion-accordion>
+        }
+    </ion-accordion-group>
+</div>

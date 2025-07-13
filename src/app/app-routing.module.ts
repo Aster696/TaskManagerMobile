@@ -17,11 +17,11 @@ const routes: Routes = [
         component: HomeComponent
     },
     {
-        path: 'add',
+        path: 'add-task',
         component: AddTaskComponent
     },
     {
-        path: 'edit/:id',
+        path: 'edit-task/:id',
         component: AddTaskComponent
     },
     {

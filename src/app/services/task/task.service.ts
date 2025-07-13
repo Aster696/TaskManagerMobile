@@ -49,4 +49,19 @@ export class TaskService {
         return result.values as Task[];
     }
 
+    async getTaskById(id: any): Promise<Task | undefined> {
+        const db = await this.initDB();
+        const result = await db.query('select * from tasks where id = ?', id);
+        return result.values as Task | undefined;
+    }
+
+    async updateTask(id: any, task: Task): Promise<void> {
+        if(!task.id) throw new Error('Task not found');
+        const db = await this.initDB();
+        await db.run(
+            `update tasks set taskName = ?, description = ?, date_time = ? where id = ?`,
+            [task.taskName, task.description, task.date_time, id]
+        )
+    }
+
 }

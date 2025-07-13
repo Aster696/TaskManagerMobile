@@ -11,6 +11,7 @@ import { AddTaskComponent } from './components/home/add-task/add-task.component'
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { AuthComponent } from './components/auth/auth.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -26,7 +27,9 @@ import { AuthComponent } from './components/auth/auth.component';
         BrowserModule,
         IonicModule.forRoot(),
         IonicModule,
-        AppRoutingModule
+        AppRoutingModule,
+        ReactiveFormsModule,
+        FormsModule
     ],
     providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
     bootstrap: [AppComponent],

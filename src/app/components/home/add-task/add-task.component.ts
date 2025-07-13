@@ -34,29 +34,31 @@ export class AddTaskComponent  implements OnInit {
     })
   }
 
-  buildForm() {
+  buildForm(data?: any) {
     this.form = this.formBuilder.group({
-      taskName: [null, [Validators.required]],
-      description: [null],
-      date_time: [null],
+      taskName: [data?.taskName || null, [Validators.required, Validators.minLength(3)]],
+      description: [data?.description || null],
+      date_time: [data?.date_time || null],
     })
   }
 
-  getTaskById() {
-    
+  async getTaskById() {
+    let task = await this.taskService.getTaskById(this.id)
+    this.buildForm(task)
   }
 
-  onSubmit() {
+  async onSubmit() {
     if(this.form.valid) {
+      console.log(this.form.value)
       const task: Task = this.form.value;
       if(!this.id) {
-        this.taskService.addTask(task)
+        await this.taskService.addTask(task);
       }else {
-        this.taskService
-        .updateTask(this.id, task)
+        await this.taskService.updateTask(this.id, task)
       }
+      this.router.navigate(['/home'])
     }else {
-      this.form.markAllAsTouched
+      this.form.markAllAsTouched();
     }
   }
 

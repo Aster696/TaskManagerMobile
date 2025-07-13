@@ -1,14 +1,45 @@
 <div class="float-center">
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Add Task</ion-card-title>
+      <ion-card-title>{{id ? 'Edit' : 'Add'}} Task</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <ion-input type="text" label="Name" labelPlacement="floating" fill="outline"></ion-input>
-        <ion-textarea type="text" label="Description" labelPlacement="floating" fill="outline" rows="3" class="mt-3"></ion-textarea>
+        <div class="w-100">
+          <ion-input formControlName="taskName" type="text" label="Name" labelPlacement="floating" fill="outline"></ion-input>
+          <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('required')">
+            Task name is required.
+          </ion-text>
+          
+          <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('minlength')">
+            Minimum 3 characters required.
+          </ion-text>
+        </div>
+        
+        <ion-textarea formControlName="description" type="text" label="Description" labelPlacement="floating" fill="outline" rows="3" class="mt-3"></ion-textarea>
         <ion-datetime-button datetime="taskDate" class="mt-3 float-end w-100"></ion-datetime-button>
-
+        <!-- show modal for date time -->
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime
+              formControlName="date_time"
+              id="taskDate"
+              presentation="date-time"
+              [formatOptions]="{
+                date: {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric'
+                },
+                time: {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                },
+              }"
+            ></ion-datetime>
+          </ng-template>
+        </ion-modal>
+        <!-- submit / cancel btn -->
         <div class="mt-3 float-end w-100">
           <ion-button (click)="onCancel()" color="danger" fill="outline" type="button">Cancel</ion-button>
           <ion-button color="primary" type="submit">Submit</ion-button>
@@ -17,24 +48,3 @@
     </ion-card-content>
   </ion-card>
 </div>
-
-<!-- show modal for date time -->
-<ion-modal [keepContentsMounted]="true">
-  <ng-template>
-    <ion-datetime
-      id="taskDate"
-      presentation="date-time"
-      [formatOptions]="{
-        date: {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        },
-        time: {
-          hour: '2-digit',
-          minute: '2-digit',
-        },
-      }"
-    ></ion-datetime>
-  </ng-template>
-</ion-modal>

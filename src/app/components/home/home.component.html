@@ -10,11 +10,24 @@
         <ion-accordion [value]="item">
             <ion-item slot="header" lines="none">
                 <ion-label>
-                    Firt accordian {{index + 1}}
+                    {{item?.taskName || '-'}}
                 </ion-label>
+                <ion-note slot="end" class="ion-text-end">
+                    {{item?.date_time ? (item?.date_time | date: 'dd-MM-YYYY, hh:mm') : '-'}}
+                </ion-note>
             </ion-item>
-            <div slot="content">
-                first content
+            <div slot="content" class="ion-padding">
+                <ion-text>
+                    {{item?.description || '-'}}
+                </ion-text>
+                <div class="float-end w-100 mt-3">
+                    <ion-fab-button (click)="confirmDelete(item?.id)" size="small" color="danger">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button [routerLink]="['/edit-task', item?.id]" size="small" color="primary">
+                        <ion-icon name="create-outline"></ion-icon>
+                    </ion-fab-button>
+                </div>
             </div>
         </ion-accordion>
         }

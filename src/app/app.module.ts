@@ -29,7 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
         IonicModule,
         AppRoutingModule,
         ReactiveFormsModule,
-        FormsModule
+        FormsModule,
     ],
     providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
     bootstrap: [AppComponent],

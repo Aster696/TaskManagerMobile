@@ -9,7 +9,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     styleUrls: ['./home.component.scss'],
     standalone: false
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
 
     items: any[] = []
 
@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
         private toastCtrl: ToastController,
     ) { }
 
-    ngOnInit() {
+    ionViewWillEnter() {
         // for (let i = 0; i < 20; i++) {
         //     this.items.push(i)
         // }
@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit {
     }
 
     async getTasks() {
+        console.log('SQL called')
         this.items = await this.taskService.getTasks();
         console.log(this.items, 'data')
     }

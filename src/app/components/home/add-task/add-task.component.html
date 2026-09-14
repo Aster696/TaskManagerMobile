@@ -6,9 +6,9 @@
     <ion-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="w-100">
-          <ion-input formControlName="taskName" type="text" label="Name" labelPlacement="floating" fill="outline"></ion-input>
+          <ion-input formControlName="taskName" type="text" label="Title" labelPlacement="floating" fill="outline"></ion-input>
           <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('required')">
-            Task name is required.
+            Task title is required.
           </ion-text>
           
           <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('minlength')">

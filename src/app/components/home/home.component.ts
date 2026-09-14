@@ -27,10 +27,13 @@ export class HomeComponent {
         this.getTasks()
     }
 
+    isLoading() {
+        return this.taskService.loading;
+    }
+
     async getTasks() {
-        console.log('SQL called')
+        this.taskService.loading = true;
         this.items = await this.taskService.getTasks();
-        console.log(this.items, 'data')
     }
 
     async confirmDelete(id: any) {

@@ -60,3 +60,14 @@
     margin-right: 16px;
 }
 
+.loader-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ion-spinner {
+    width: 100px;
+    height: 100px;
+}

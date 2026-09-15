@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as moment from 'moment';
 import { TaskService } from 'src/app/services/task/task.service';
 import { Task } from 'src/app/services/task/task.service';
 
@@ -15,6 +16,7 @@ export class AddTaskComponent  implements OnInit {
 
   form!: FormGroup;
   id: any;
+  minDateTime = moment().format('YYYY-MM-DDTHH:mm:ss');
 
   constructor(
     private formBuilder: FormBuilder,
@@ -38,7 +40,7 @@ export class AddTaskComponent  implements OnInit {
     this.form = this.formBuilder.group({
       taskName: [data?.taskName || null, [Validators.required, Validators.minLength(3)]],
       description: [data?.description || null],
-      date_time: [data?.date_time || null],
+      date_time: [data?.date_time || moment().format('YYYY-MM-DDTHH:mm:ss')],
     })
   }
 
@@ -49,6 +51,7 @@ export class AddTaskComponent  implements OnInit {
 
   async onSubmit() {
     if(this.form.valid) {
+      this.taskService.loading = true;
       console.log(this.form.value)
       const task: Task = this.form.value;
       if(!this.id) {

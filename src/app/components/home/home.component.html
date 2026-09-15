@@ -19,9 +19,9 @@
                 {{ item?.taskName || '-' }}
               </ion-label>
   
-              <ion-note slot="end" class="ion-text-end">
+              <ion-note slot="end" class="  ">
                 {{ item?.date_time
-                  ? (item?.date_time | date: 'dd-MM-YYYY, hh:mm')
+                  ? (item?.date_time | date: 'dd-MM-yyyy, hh:mm')
                   : '-' }}
               </ion-note>
             </ion-item>
@@ -49,6 +49,10 @@
             </div>
   
           </ion-accordion>
+        }@empty {
+          <h3 class="text-center">
+            No Task Set
+          </h3>
         }
       </ion-accordion-group>
     </div>

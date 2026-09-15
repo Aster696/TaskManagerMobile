@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { TaskService } from 'src/app/services/task/task.service';
-import { Task } from '../../services/task/task.service';
+import * as moment from 'moment';
 import { AlertController, ToastController } from '@ionic/angular';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
     selector: 'app-home',
@@ -24,7 +25,8 @@ export class HomeComponent {
         //     this.items.push(i)
         // }
         // console.log(this.items)
-        this.getTasks()
+        this.getTasks();
+        this.notificationPermission()
     }
 
     isLoading() {
@@ -34,6 +36,12 @@ export class HomeComponent {
     async getTasks() {
         this.taskService.loading = true;
         this.items = await this.taskService.getTasks();
+        console.log(this.items);
+        for(let item of this.items) {
+            if(item.date_time && moment(item.date_time).isAfter(moment())) {
+                this.scheduleTaskNotification(item);
+            }
+        }
     }
 
     async confirmDelete(id: any) {
@@ -76,6 +84,29 @@ export class HomeComponent {
             position: 'bottom'
         });
         await toast.present();
+    }
+
+    async notificationPermission() {
+        const permission = await LocalNotifications.requestPermissions();
+        console.log(permission)
+    }
+
+    async scheduleTaskNotification(task: any) {
+        if(!task.date_time) return;
+
+        await LocalNotifications.schedule({
+            notifications: [{
+                 id: task.id,
+                 title: 'Task Reminder',
+                 body: task.taskName,
+                 schedule: {
+                    at: new Date(task.date_time)
+                 },
+                 extra: {
+                    taskId: task.id
+                 }
+            }]
+        })
     }
 
 }

@@ -21,10 +21,6 @@ export class HomeComponent {
     ) { }
 
     ionViewWillEnter() {
-        // for (let i = 0; i < 20; i++) {
-        //     this.items.push(i)
-        // }
-        // console.log(this.items)
         this.getTasks();
         this.notificationPermission()
     }
@@ -37,11 +33,11 @@ export class HomeComponent {
         this.taskService.loading = true;
         this.items = await this.taskService.getTasks();
         console.log(this.items);
-        for(let item of this.items) {
-            if(item.date_time && moment(item.date_time).isAfter(moment())) {
-                this.scheduleTaskNotification(item);
-            }
-        }
+        // for(let item of this.items) {
+        //     if(item.date_time && moment(item.date_time).isAfter(moment())) {
+        //         this.scheduleTaskNotification(item);
+        //     }
+        // }
     }
 
     async confirmDelete(id: any) {
@@ -92,21 +88,7 @@ export class HomeComponent {
     }
 
     async scheduleTaskNotification(task: any) {
-        if(!task.date_time) return;
-
-        await LocalNotifications.schedule({
-            notifications: [{
-                 id: task.id,
-                 title: 'Task Reminder',
-                 body: task.taskName,
-                 schedule: {
-                    at: new Date(task.date_time)
-                 },
-                 extra: {
-                    taskId: task.id
-                 }
-            }]
-        })
+        await this.taskService.scheduleTaskNotification(task);
     }
 
 }

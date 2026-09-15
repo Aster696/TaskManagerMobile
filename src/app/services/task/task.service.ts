@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 export interface Task {
     id?: number;
     taskName: string;
     description: string;
     date_time: string;
+    repeat_type: 'none' | 'daily' | 'weekly',
+    repeat_days: number[];
 }
 @Injectable({
     providedIn: 'root'
@@ -22,28 +25,60 @@ export class TaskService {
 
     private async initDB(): Promise<SQLiteDBConnection> {
         if (this.db) return this.db;
-
-        this.db = await this.sqlite?.createConnection('taskdb', false, 'no-encryption', 1, false);
+    
+        this.db = await this.sqlite?.createConnection(
+            'taskdb',
+            false,
+            'no-encryption',
+            1,
+            false
+        );
+    
         await this.db?.open();
+    
         await this.db?.execute(`
             CREATE TABLE IF NOT EXISTS tasks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 taskName TEXT NOT NULL,
                 description TEXT,
-                date_time TEXT
+                date_time TEXT,
+                repeat_type TEXT DEFAULT 'none',
+                repeat_days TEXT DEFAULT '[]'
             )
-        `)
-
+        `);
+    
+        // Check existing columns
+        const tableInfo = await this.db?.query(`PRAGMA table_info(tasks)`);
+    
+        const columns = tableInfo?.values?.map((column: any) => column.name) || [];
+    
+        // Migration: repeat_type
+        if (!columns.includes('repeat_type')) {
+            await this.db?.execute(`
+                ALTER TABLE tasks
+                ADD COLUMN repeat_type TEXT DEFAULT 'none'
+            `);
+        }
+    
+        // Migration: repeat_days
+        if (!columns.includes('repeat_days')) {
+            await this.db?.execute(`
+                ALTER TABLE tasks
+                ADD COLUMN repeat_days TEXT
+            `);
+        }
+    
         return this.db!;
     }
 
-    async addTask(task: Task): Promise<void> {
+    async addTask(task: Task): Promise<any> {
         const db = await this.initDB();
-        await db.run(
-            'INSERT INTO tasks (taskName, description, date_time) VALUES (?, ?, ?)',
-            [task.taskName, task.description, task.date_time]
+        const result = await db.run(
+            'INSERT INTO tasks (taskName, description, date_time, repeat_type, repeat_days) VALUES (?, ?, ?, ?, ?)',
+            [task.taskName, task.description, task.date_time, task.repeat_type, JSON.stringify(task.repeat_days)]
         );
         this.loading = false;
+        return result.changes?.lastId;
     }
 
     async getTasks(): Promise<Task[]> {
@@ -64,8 +99,8 @@ export class TaskService {
         if(!id) throw new Error('Id is required');
         const db = await this.initDB();
         await db.run(
-            `update tasks set taskName = ?, description = ?, date_time = ? where id = ?`,
-            [task.taskName, task.description, task.date_time, id]
+            `update tasks set taskName = ?, description = ?, date_time = ?, repeat_type =?, repeat_days = ? where id = ?`,
+            [task.taskName, task.description, task.date_time, task.repeat_type, JSON.stringify(task.repeat_days), id]
         );
         this.loading = false;
     }
@@ -76,6 +111,25 @@ export class TaskService {
         const result = await db.run(`delete from tasks where id = ?`, [id]);
         this.loading = false;
         return result.changes?.changes ?? 0;
+    }
+
+    // notification
+    async scheduleTaskNotification(task: any) {
+        if(!task.date_time) return;
+
+        await LocalNotifications.schedule({
+            notifications: [{
+                 id: task.id,
+                 title: 'Task Reminder',
+                 body: task.taskName,
+                 schedule: {
+                    at: new Date(task.date_time)
+                 },
+                 extra: {
+                    taskId: task.id
+                 }
+            }]
+        })
     }
 
 }

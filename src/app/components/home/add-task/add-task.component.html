@@ -40,6 +40,30 @@
             ></ion-datetime>
           </ng-template>
         </ion-modal>
+        <!-- repeat type -->
+        <ion-select formControlName="repeat_type" label="Repeat" class="mt-3">
+          <ion-select-option value="none">
+            Never
+          </ion-select-option>
+          <ion-select-option value="daily">
+            Daily
+          </ion-select-option>
+          <ion-select-option value="weekly">
+            Weekly
+          </ion-select-option>
+        </ion-select>
+        <!-- weekly option -->
+        @if(form.get('repeat_type')?.value == 'weekly') {
+          @for (day of days; track day.value) {
+            <ion-item>
+              <ion-checkbox
+                [checked]="selectedDays.includes(day.value)"
+                (ionChange)="toggleDay(day.value, $event.detail.checked)">
+                {{ day.label }}
+              </ion-checkbox>
+            </ion-item>
+          }
+        }
         <!-- submit / cancel btn -->
         <div class="mt-3 float-end w-100">
           <ion-button (click)="onCancel()" color="danger" fill="outline" type="button">Cancel</ion-button>

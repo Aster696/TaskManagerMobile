@@ -114,12 +114,28 @@ export class TaskService {
     }
 
     // notification
-    async scheduleTaskNotification(task: any) {
-        if(!task.date_time) return;
+    async scheduleTaskNotification(task: Task) {
+        if(!task.date_time || !task.id) return;
 
+        const date = new Date(task.date_time);
+        
+        switch(task.repeat_type) {
+            case 'none':
+                await this.scheduleOnce(task);
+                break;
+            case 'daily': 
+                await this.scheduleDaily(task, date);
+                break;
+            case 'weekly':
+                await this.scheduleWeekly(task, date);
+                break;
+        }
+    }
+
+    private async scheduleOnce(task: Task) {
         await LocalNotifications.schedule({
             notifications: [{
-                 id: task.id,
+                 id: task.id!,
                  title: 'Task Reminder',
                  body: task.taskName,
                  schedule: {
@@ -129,7 +145,63 @@ export class TaskService {
                     taskId: task.id
                  }
             }]
+        });
+    }
+
+    private async scheduleDaily(task: Task, date: Date) {
+        await LocalNotifications.schedule({
+            notifications: [{
+                id: task.id!,
+                title: 'Task Reminder',
+                body: task.taskName,
+                schedule: {
+                    on: {
+                        hour: date.getHours(),
+                        minute: date.getMinutes()
+                    }
+                },
+                extra: {
+                    taskId: task.id
+                }
+            }]
+        });
+    }
+
+    private async scheduleWeekly(task: Task, date: Date) {
+        if(!task.repeat_days.length) return;
+
+        const notifications = task.repeat_days.map((day: any) => ({
+            id: this.getNotificationId(task.id!, day),
+            title: 'Task Reminder',
+            body: task.taskName,
+            schedule: {
+                on: {
+                    weekday: day,
+                    hour: date.getHours(),
+                    minute: date.getMinutes()
+                }
+            },
+            extra: {
+                taskId: task.id,
+                weekday: day
+            }
+        }));
+
+        await LocalNotifications.schedule({
+            notifications
         })
+    }
+
+    private getNotificationId(taskId: number, day: number): number {
+        return taskId * 10 + day;
+    }
+
+    async removeTaskNotification(id: number) {
+        await LocalNotifications.cancel({
+            notifications: [{
+              id: id
+            }]
+          });
     }
 
 }

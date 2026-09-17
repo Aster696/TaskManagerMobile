@@ -100,11 +100,7 @@ export class AddTaskComponent  implements OnInit {
   async updateTaskNotification(item: any) {
     if(!item?.id || !item.date_time) return;
 
-    await LocalNotifications.cancel({
-      notifications: [{
-        id: item?.id
-      }]
-    });
+    await this.taskService.removeTaskNotification(item?.id);
 
     if(moment(item.date_time).isAfter(moment())) {
       await this.taskService.scheduleTaskNotification(item)

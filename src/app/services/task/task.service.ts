@@ -91,8 +91,13 @@ export class TaskService {
     async getTaskById(id: any): Promise<Task | undefined> {
         const db = await this.initDB();
         const result = await db.query('select * from tasks where id = ?', [id]);
+        let task = result.values?.[0];
+        task = {
+            ...task,
+            repeat_days: JSON.parse(task.repeat_days)
+        }
         this.loading = false;
-        return result.values?.[0] as Task | undefined;
+        return task as Task | undefined;
     }
 
     async updateTask(id: any, task: Task): Promise<void> {

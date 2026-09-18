@@ -54,12 +54,9 @@ export class AddTaskComponent  implements OnInit {
       description: [data?.description || null],
       date_time: [data?.date_time || moment().format('YYYY-MM-DDTHH:mm:ss')],
       repeat_type: [data?.repeat_type || 'none'],
-      repeat_days: [
-        data?.repeat_days
-        ? JSON.parse(data.repeat_days)
-        : []
-      ]
-    })
+      repeat_days: [[]]
+    });
+    this.selectedDays = data?.repeat_days;
   }
 
   async getTaskById() {

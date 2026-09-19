@@ -67,6 +67,13 @@ export class TaskService {
                 ADD COLUMN repeat_days TEXT
             `);
         }
+
+        if (!columns.includes('is_completed')) {
+            await this.db?.execute(`
+                ALTER TABLE tasks
+                ADD COLUMN is_completed INTEGER DEFAULT 0
+            `);
+        }
     
         return this.db!;
     }

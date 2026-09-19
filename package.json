@@ -30,6 +30,8 @@
     "@capacitor/local-notifications": "^7.0.7",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "ionicons": "^7.0.0",
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",

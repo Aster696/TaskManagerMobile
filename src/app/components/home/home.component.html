@@ -15,14 +15,23 @@
           <ion-accordion [value]="item">
   
             <ion-item slot="header" lines="none">
-              <ion-label>
+              <ion-label class="d-flex align-items-center">
+                <i class="bi bi-grip-vertical fs-4 cursor-grab"></i>
+              <ion-checkbox 
+                (click)="$event.stopPropagation()"
+                (ionChange)="$event.stopPropagation()"
+                labelPlacement="end"
+              >
                 {{ item?.taskName || '-' }}
+              </ion-checkbox>
               </ion-label>
   
-              <ion-note slot="end" class="  ">
-                {{ item?.date_time
-                  ? (item?.date_time | date: 'dd-MM-yyyy, hh:mm')
-                  : '-' }}
+              <ion-note slot="end" class="mt-1">
+                <span>
+                  {{ item?.date_time
+                    ? (item?.date_time | date: 'dd-MM-yyyy, hh:mm')
+                    : '-' }}
+                </span>
               </ion-note>
             </ion-item>
   

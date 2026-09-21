@@ -18,9 +18,11 @@
               <ion-label class="d-flex align-items-center">
                 <i class="bi bi-grip-vertical fs-4 cursor-grab"></i>
               <ion-checkbox 
+                [checked]="item.is_completed"
                 (click)="$event.stopPropagation()"
-                (ionChange)="$event.stopPropagation()"
+                (ionChange)="updateTaskCompleted(item,$event.detail.checked)"
                 labelPlacement="end"
+                [class]="item.is_completed ? 'text-decoration-line-through' : ''"
               >
                 {{ item?.taskName || '-' }}
               </ion-checkbox>

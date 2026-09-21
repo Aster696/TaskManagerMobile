@@ -7,8 +7,9 @@ export interface Task {
     taskName: string;
     description: string;
     date_time: string;
-    repeat_type: 'none' | 'daily' | 'weekly',
+    repeat_type: 'none' | 'daily' | 'weekly';
     repeat_days: number[];
+    is_completed: boolean;
 }
 @Injectable({
     providedIn: 'root'
@@ -113,6 +114,16 @@ export class TaskService {
         await db.run(
             `update tasks set taskName = ?, description = ?, date_time = ?, repeat_type =?, repeat_days = ? where id = ?`,
             [task.taskName, task.description, task.date_time, task.repeat_type, JSON.stringify(task.repeat_days), id]
+        );
+        this.loading = false;
+    }
+
+    async updateTaskCompleted(id: any, is_completed: boolean): Promise<void> {
+        if(!id) throw new Error('Id is required');
+        const db = await this.initDB();
+        await db.run(
+            `update tasks set is_completed = ? where id = ?`,
+            [is_completed, id]
         );
         this.loading = false;
     }

@@ -33,11 +33,11 @@ export class HomeComponent {
         this.taskService.loading = true;
         this.items = await this.taskService.getTasks();
         console.log(this.items);
-        // for(let item of this.items) {
-        //     if(item.date_time && moment(item.date_time).isAfter(moment())) {
-        //         this.scheduleTaskNotification(item);
-        //     }
-        // }
+    }
+
+    async updateTaskCompleted(task: any, is_completed: any) {
+        task.is_completed = is_completed
+        await this.taskService.updateTaskCompleted(task.id, is_completed);
     }
 
     async confirmDelete(id: any) {

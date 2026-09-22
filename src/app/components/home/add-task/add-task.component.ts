@@ -56,7 +56,7 @@ export class AddTaskComponent  implements OnInit {
       repeat_type: [data?.repeat_type || 'none'],
       repeat_days: [[]]
     });
-    this.selectedDays = data?.repeat_days;
+    this.selectedDays = data?.repeat_days || [];
   }
 
   async getTaskById() {

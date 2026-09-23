@@ -41,8 +41,13 @@
           </ng-template>
         </ion-modal>
         <!-- repeat type -->
-        <ion-select formControlName="repeat_type" label="Repeat" labelPlacement="floating"
-        fill="outline" class="mt-3">
+        <ion-select 
+          formControlName="repeat_type" 
+          (ionChange)="selectedDays = []"
+          label="Repeat" 
+          labelPlacement="floating"
+          fill="outline" class="mt-3"
+        >
           <ion-select-option value="none">
             Never
           </ion-select-option>

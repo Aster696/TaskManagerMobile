@@ -9,7 +9,8 @@ export interface Task {
     date_time: string;
     repeat_type: 'none' | 'daily' | 'weekly';
     repeat_days: number[];
-    is_completed: boolean;
+    is_completed?: boolean;
+    sort_order?: number;
 }
 @Injectable({
     providedIn: 'root'
@@ -75,6 +76,13 @@ export class TaskService {
                 ADD COLUMN is_completed INTEGER DEFAULT 0
             `);
         }
+
+        if (!columns.includes('sort_order')) {
+            await this.db?.execute(`
+                ALTER TABLE tasks
+                ADD COLUMN sort_order INTEGER
+            `)
+        }
     
         return this.db!;
     }
@@ -91,7 +99,7 @@ export class TaskService {
 
     async getTasks(): Promise<Task[]> {
         const db = await this.initDB();
-        const result = await db.query('Select * from tasks');
+        const result = await db.query('Select * from tasks ORDER BY sort_order ASC');
         this.loading = false;
         return result.values as Task[];
     }

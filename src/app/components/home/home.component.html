@@ -10,22 +10,27 @@
     </ion-fab>
   
     <div class="accordion-s">
-      <ion-accordion-group>
+      <ion-reorder-group
+        [disabled]="false"
+        (ionItemReorder)="handleReorder($event)"
+      >
         @for (item of items; track $index; let index = $index) {
-          <ion-accordion [value]="item">
+          <ion-accordion [value]="item.id">
   
             <ion-item slot="header" lines="none">
+              
+              <ion-reorder slot="start"></ion-reorder>
+
               <ion-label class="d-flex align-items-center">
-                <i class="bi bi-grip-vertical fs-4 cursor-grab"></i>
-              <ion-checkbox 
-                [checked]="item.is_completed"
-                (click)="$event.stopPropagation()"
-                (ionChange)="updateTaskCompleted(item,$event.detail.checked)"
-                labelPlacement="end"
-                [class]="item.is_completed ? 'text-decoration-line-through' : ''"
-              >
-                {{ item?.taskName || '-' }}
-              </ion-checkbox>
+                <ion-checkbox 
+                  [checked]="item.is_completed"
+                  (click)="$event.stopPropagation()"
+                  (ionChange)="updateTaskCompleted(item,$event.detail.checked)"
+                  labelPlacement="end"
+                  [class]="item.is_completed ? 'text-decoration-line-through' : ''"
+                >
+                  {{ item?.taskName || '-' }}
+                </ion-checkbox>
               </ion-label>
   
               <ion-note slot="end" class="mt-1">
@@ -65,6 +70,6 @@
             No Task Set
           </h3>
         }
-      </ion-accordion-group>
+      </ion-reorder-group>
     </div>
   }

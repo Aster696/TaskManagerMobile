@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { TaskService } from 'src/app/services/task/task.service';
 import * as moment from 'moment';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ItemReorderCustomEvent, ItemReorderEventDetail, ToastController } from '@ionic/angular';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
@@ -89,6 +89,10 @@ export class HomeComponent {
 
     async scheduleTaskNotification(task: any) {
         await this.taskService.scheduleTaskNotification(task);
+    }
+
+    handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
+        
     }
 
 }

@@ -1,6 +1,7 @@
     import { Injectable } from '@angular/core';
     import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
     import { LocalNotifications } from '@capacitor/local-notifications';
+import { DatabaseService } from '../database/database.service';
 
     export interface Task {
         id?: number;
@@ -18,77 +19,13 @@
     export class TaskService {
 
         public loading: boolean = false;
-        
-        private db: SQLiteDBConnection | undefined;
-        private sqlite: SQLiteConnection | undefined;
-        constructor() {
-            this.sqlite = new SQLiteConnection(CapacitorSQLite)
-        }
-
-        private async initDB(): Promise<SQLiteDBConnection> {
-            if (this.db) return this.db;
-        
-            this.db = await this.sqlite?.createConnection(
-                'taskdb',
-                false,
-                'no-encryption',
-                1,
-                false
-            );
-        
-            await this.db?.open();
-        
-            await this.db?.execute(`
-                CREATE TABLE IF NOT EXISTS tasks (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    taskName TEXT NOT NULL,
-                    description TEXT,
-                    date_time TEXT,
-                    repeat_type TEXT DEFAULT 'none',
-                    repeat_days TEXT DEFAULT '[]'
-                )
-            `);
-        
-            // Check existing columns
-            const tableInfo = await this.db?.query(`PRAGMA table_info(tasks)`);
-        
-            const columns = tableInfo?.values?.map((column: any) => column.name) || [];
-        
-            // Migration: repeat_type
-            if (!columns.includes('repeat_type')) {
-                await this.db?.execute(`
-                    ALTER TABLE tasks
-                    ADD COLUMN repeat_type TEXT DEFAULT 'none'
-                `);
-            }
-        
-            // Migration: repeat_days
-            if (!columns.includes('repeat_days')) {
-                await this.db?.execute(`
-                    ALTER TABLE tasks
-                    ADD COLUMN repeat_days TEXT
-                `);
-            }
-
-            if (!columns.includes('is_completed')) {
-                await this.db?.execute(`
-                    ALTER TABLE tasks
-                    ADD COLUMN is_completed INTEGER DEFAULT 0
-                `);
-            }
-
-            if (!columns.includes('sort_order')) {
-                await this.db?.execute(`
-                    ALTER TABLE tasks
-                    ADD COLUMN sort_order INTEGER DEFAULT 0
-                `)
-            }
-        
-            return this.db!;
-        }
+    
+        constructor(
+            private databaseService: DatabaseService
+        ) {}
 
         async addTask(task: Task): Promise<any> {
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
         
             const result = await db.query(`
                 SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order
@@ -118,14 +55,14 @@
         }
 
         async getTasks(): Promise<Task[]> {
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
             const result = await db.query('Select * from tasks ORDER BY sort_order ASC');
             this.loading = false;
             return result.values as Task[];
         }
 
         async getTaskById(id: any): Promise<Task | undefined> {
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
             const result = await db.query('select * from tasks where id = ?', [id]);
             let task = result.values?.[0];
             task = {
@@ -138,7 +75,7 @@
 
         async updateTask(id: any, task: Task): Promise<void> {
             if(!id) throw new Error('Id is required');
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
             await db.run(
                 `update tasks set taskName = ?, description = ?, date_time = ?, repeat_type =?, repeat_days = ? where id = ?`,
                 [task.taskName, task.description, task.date_time, task.repeat_type, JSON.stringify(task.repeat_days), id]
@@ -148,7 +85,7 @@
 
         async updateTaskCompleted(id: any, is_completed: boolean): Promise<void> {
             if(!id) throw new Error('Id is required');
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
             await db.run(
                 `update tasks set is_completed = ? where id = ?`,
                 [is_completed, id]
@@ -158,7 +95,7 @@
 
         async deleteTask(id: any): Promise<number> {
             if(!id) throw new Error('Id is required');
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
             const result = await db.run(`delete from tasks where id = ?`, [id]);
             this.loading = false;
             return result.changes?.changes ?? 0;
@@ -257,7 +194,7 @@
 
         // update task order
         async updateTaskOrder(tasks: Task[]): Promise<void> {
-            const db = await this.initDB();
+            const db = this.databaseService.getDB();
         
             for (let i = 0; i < tasks.length; i++) {
             await db.run(

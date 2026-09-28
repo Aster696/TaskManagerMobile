@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
 import { TaskService } from 'src/app/services/task/task.service';
-import * as moment from 'moment';
-import { AlertController, ItemReorderCustomEvent, ItemReorderEventDetail, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import {
+    CdkDragDrop,
+    moveItemInArray
+} from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
-    standalone: false
+    standalone: false,
 })
 export class HomeComponent {
 
@@ -91,8 +94,13 @@ export class HomeComponent {
         await this.taskService.scheduleTaskNotification(task);
     }
 
-    handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
-        
-    }
-
+    drop(event: CdkDragDrop<Task[]>) {
+        moveItemInArray(
+          this.items,
+          event.previousIndex,
+          event.currentIndex
+        );
+        console.log(this.items)
+        this.taskService.updateTaskOrder(this.items);
+      }
 }

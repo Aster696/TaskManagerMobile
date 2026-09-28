@@ -1,75 +1,149 @@
 @if (isLoading()) {
-    <div class="loader-container">
-      <ion-spinner name="dots" color="primary"></ion-spinner>
-    </div>
-  } @else {
-    <ion-fab horizontal="end" vertical="bottom" slot="fixed">
-      <ion-fab-button [routerLink]="['/add-task']">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-  
-    <div class="accordion-s">
-      <ion-reorder-group
-        [disabled]="false"
-        (ionItemReorder)="handleReorder($event)"
-      >
-        @for (item of items; track $index; let index = $index) {
-          <ion-accordion [value]="item.id">
-  
-            <ion-item slot="header" lines="none">
-              
-              <ion-reorder slot="start"></ion-reorder>
 
-              <ion-label class="d-flex align-items-center">
-                <ion-checkbox 
+  <div class="loader-container">
+    <ion-spinner
+      name="dots"
+      color="primary">
+    </ion-spinner>
+  </div>
+
+} @else {
+
+  <ion-fab
+    horizontal="end"
+    vertical="bottom"
+    slot="fixed">
+
+    <ion-fab-button
+      [routerLink]="['/add-task']">
+
+      <ion-icon name="add"></ion-icon>
+
+    </ion-fab-button>
+
+  </ion-fab>
+
+
+  <div class="accordion-s">
+
+    <div
+      cdkDropList
+      [cdkDropListData]="items"
+      (cdkDropListDropped)="drop($event)"
+    >
+
+      @for (item of items; track item.id) {
+
+        <div
+          cdkDrag
+          [cdkDragData]="item"
+        >
+
+          <ion-accordion [value]="item.id">
+
+            <ion-item
+              slot="header"
+              lines="none"
+            >
+
+              <div
+                cdkDragHandle
+                class="drag-handle me-2"
+              >
+                <i class="bi bi-grip-vertical fs-4"></i>
+              </div>
+
+
+              <ion-label>
+
+                <ion-checkbox
                   [checked]="item.is_completed"
+
                   (click)="$event.stopPropagation()"
-                  (ionChange)="updateTaskCompleted(item,$event.detail.checked)"
+
+                  (ionChange)="
+                    updateTaskCompleted(
+                      item,
+                      $event.detail.checked
+                    )
+                  "
+
                   labelPlacement="end"
-                  [class]="item.is_completed ? 'text-decoration-line-through' : ''"
+
+                  [class]="
+                    item.is_completed
+                      ? 'text-decoration-line-through'
+                      : ''
+                  "
                 >
-                  {{ item?.taskName || '-' }}
+                  {{ item.taskName || '-' }}
                 </ion-checkbox>
+
               </ion-label>
-  
-              <ion-note slot="end" class="mt-1">
-                <span>
-                  {{ item?.date_time
-                    ? (item?.date_time | date: 'dd-MM-yyyy, hh:mm')
-                    : '-' }}
-                </span>
+
+
+              <ion-note slot="end">
+
+                {{
+                  item.date_time
+                    ? (item.date_time | date: 'dd-MM-yyyy, hh:mm')
+                    : '-'
+                }}
+
               </ion-note>
+
             </ion-item>
-  
-            <div slot="content" class="ion-padding">
+
+
+            <div
+              slot="content"
+              class="ion-padding"
+            >
+
               <ion-text>
-                {{ item?.description || '-' }}
+                {{ item.description || '-' }}
               </ion-text>
-  
+
+
               <div class="float-end w-100 mt-3">
+
                 <ion-fab-button
-                  (click)="confirmDelete(item?.id)"
+                  (click)="confirmDelete(item.id)"
                   size="small"
-                  color="danger">
+                  color="danger"
+                >
                   <ion-icon name="trash-outline"></ion-icon>
                 </ion-fab-button>
-  
+
+
                 <ion-fab-button
-                  [routerLink]="['/edit-task', item?.id]"
+                  [routerLink]="[
+                    '/edit-task',
+                    item.id
+                  ]"
                   size="small"
-                  color="primary">
+                  color="primary"
+                >
                   <ion-icon name="create-outline"></ion-icon>
                 </ion-fab-button>
+
               </div>
+
             </div>
-  
+
           </ion-accordion>
-        }@empty {
-          <h3 class="text-center">
-            No Task Set
-          </h3>
-        }
-      </ion-reorder-group>
+
+        </div>
+
+      } @empty {
+
+        <h3 class="text-center">
+          No Task Set
+        </h3>
+
+      }
+
     </div>
-  }
+
+  </div>
+}

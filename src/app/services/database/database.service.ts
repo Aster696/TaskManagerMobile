@@ -122,6 +122,30 @@ export class DatabaseService {
     }
   }
 
+  async runInTransaction<T>(
+    callback: (db: SQLiteDBConnection) => Promise<T>
+  ): Promise<T> {
+    const db = this.getDB();
+
+    await db.beginTransaction();
+
+    try {
+      const result = await callback(db);
+
+      await db.commitTransaction();
+
+      return result;
+    } catch (error) {
+      try {
+        await db.rollbackTransaction();
+      } catch (rollbackError) {
+        console.error('Failed to roll back SQLite transaction:', rollbackError);
+      }
+
+      throw error;
+    }
+  }
+
   getDB(): SQLiteDBConnection {
 
     if (!this.db) {

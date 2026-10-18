@@ -1,0 +1,31 @@
+.selected-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .selected-image {
+    width: 120px;
+    position: relative;
+  }
+  
+  .selected-image img {
+    width: 120px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .selected-image ion-button {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    --padding-start: 4px;
+    --padding-end: 4px;
+  }
+  
+  .selected-image p {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }

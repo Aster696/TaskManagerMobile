@@ -1,24 +1,238 @@
-<div class="float-center">
+
+<div class="float-center overflow-y-scroll">
   <ion-card>
     <ion-card-header>
-      <ion-card-title>{{id ? 'Edit' : 'Add'}} Task</ion-card-title>
+      <ion-card-title>
+        {{ id ? 'Edit' : 'Add' }} Task
+      </ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="w-100">
-          <ion-input formControlName="taskName" type="text" label="Title" labelPlacement="floating" fill="outline"></ion-input>
-          <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('required')">
-            Task title is required.
-          </ion-text>
-          
-          <ion-text color="danger" *ngIf="form.get('taskName')?.touched && form.get('taskName')?.hasError('minlength')">
-            Minimum 3 characters required.
-          </ion-text>
+
+        <!-- Existing banner images -->
+        @if (id !== null && existingImages.length > 0) {
+          <ion-list>
+            <ion-list-header>
+              <ion-label>Saved Banner Images</ion-label>
+            </ion-list-header>
+
+            <div class="selected-images">
+              @for (image of existingImages; track image.id) {
+                <div class="selected-image">
+
+                  @if (!image.remove) {
+                    <img
+                      [src]="image.previewUrl"
+                      alt="Saved task image"
+                    />
+
+                    <ion-button
+                      type="button"
+                      fill="clear"
+                      color="danger"
+                      (click)="removeExistingImage(image.id)"
+                      aria-label="Remove existing image"
+                    >
+                      <ion-icon name="close-circle"></ion-icon>
+                    </ion-button>
+                  } @else {
+                    <div class="removed-media">
+                      <p>Image marked for removal</p>
+
+                      <ion-button
+                        type="button"
+                        size="small"
+                        fill="outline"
+                        (click)="undoRemoveImage(image.id)"
+                      >
+                        Undo
+                      </ion-button>
+                    </div>
+                  }
+
+                </div>
+              }
+            </div>
+          </ion-list>
+        }
+
+        <!-- Select new banner images -->
+        <ion-item lines="none">
+          <ion-label>Banner Images</ion-label>
+
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            (change)="onImagesSelected($event)"
+          />
+        </ion-item>
+
+        <!-- Newly selected image previews -->
+        <div class="selected-images">
+          @for (image of selectedImages; track image.previewUrl; let i = $index) {
+            <div class="selected-image">
+              <img
+                [src]="image.previewUrl"
+                [alt]="image.file_name"
+              />
+
+              <ion-button
+                type="button"
+                fill="clear"
+                color="danger"
+                (click)="removeImage(i)"
+                aria-label="Remove selected image"
+              >
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+
+              <p>{{ image.file_name }}</p>
+            </div>
+          }
         </div>
-        
-        <ion-textarea formControlName="description" type="text" label="Description" labelPlacement="floating" fill="outline" rows="3" class="mt-3"></ion-textarea>
-        <ion-datetime-button datetime="taskDate" class="mt-3 w-100"></ion-datetime-button>
-        <!-- show modal for date time -->
+
+        <!-- Existing attachments -->
+        @if (id !== null && existingAttachments.length > 0) {
+          <ion-list>
+            <ion-list-header>
+              <ion-label>Saved Attachments</ion-label>
+            </ion-list-header>
+
+            @for (file of existingAttachments; track file.id) {
+              <ion-item>
+                @if (!file.remove) {
+                  <ion-icon
+                    name="document-outline"
+                    slot="start"
+                  ></ion-icon>
+
+                  <ion-label>
+                    <h3>{{ file.file_name }}</h3>
+                    <p>
+                      {{
+                        file.file_size != null
+                          ? ((file.file_size / 1024) | number:'1.0-1') + ' KB'
+                          : 'File attachment'
+                      }}
+                    </p>
+                  </ion-label>
+
+                  <ion-button
+                    type="button"
+                    fill="clear"
+                    color="danger"
+                    (click)="removeExistingAttachment(file.id)"
+                    aria-label="Remove existing attachment"
+                  >
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-button>
+                } @else {
+                  <ion-label>
+                    {{ file.file_name }} — marked for removal
+                  </ion-label>
+
+                  <ion-button
+                    type="button"
+                    fill="outline"
+                    size="small"
+                    (click)="undoRemoveAttachment(file.id)"
+                  >
+                    Undo
+                  </ion-button>
+                }
+              </ion-item>
+            }
+          </ion-list>
+        }
+
+        <!-- Select new attachments -->
+        <ion-item lines="none">
+          <ion-label>Attachments</ion-label>
+
+          <input
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,image/*"
+            (change)="onFilesSelected($event)"
+          />
+        </ion-item>
+
+        <!-- Newly selected attachments -->
+        <ion-list>
+          @for (file of selectedFiles; track $index; let i = $index) {
+            <ion-item>
+              <ion-icon
+                name="document-outline"
+                slot="start"
+              ></ion-icon>
+
+              <ion-label>
+                <h3>{{ file.file_name }}</h3>
+                <p>
+                  {{ (file.file_size / 1024) | number:'1.0-1' }} KB
+                </p>
+              </ion-label>
+
+              <ion-button
+                type="button"
+                fill="clear"
+                color="danger"
+                (click)="removeFile(i)"
+                aria-label="Remove selected attachment"
+              >
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+
+        <!-- Task title -->
+        <div class="w-100">
+          <ion-input
+            formControlName="taskName"
+            type="text"
+            label="Title"
+            labelPlacement="floating"
+            fill="outline"
+          ></ion-input>
+
+          @if (
+            form.get('taskName')?.touched &&
+            form.get('taskName')?.hasError('required')
+          ) {
+            <ion-text color="danger">
+              Task title is required.
+            </ion-text>
+          }
+
+          @if (
+            form.get('taskName')?.touched &&
+            form.get('taskName')?.hasError('minlength')
+          ) {
+            <ion-text color="danger">
+              Minimum 3 characters required.
+            </ion-text>
+          }
+        </div>
+
+        <!-- Description -->
+        <ion-textarea
+          formControlName="description"
+          label="Description"
+          labelPlacement="floating"
+          fill="outline"
+          rows="3"
+          class="mt-3"
+        ></ion-textarea>
+
+        <!-- Date and time -->
+        <ion-datetime-button
+          datetime="taskDate"
+          class="mt-3 w-100"
+        ></ion-datetime-button>
+
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
             <ion-datetime
@@ -34,32 +248,37 @@
                 },
                 time: {
                   hour: '2-digit',
-                  minute: '2-digit',
-                },
+                  minute: '2-digit'
+                }
               }"
             ></ion-datetime>
           </ng-template>
         </ion-modal>
-        <!-- repeat type -->
-        <ion-select 
-          formControlName="repeat_type" 
-          (ionChange)="selectedDays = []"
-          label="Repeat" 
+
+        <!-- Repeat type -->
+        <ion-select
+          formControlName="repeat_type"
+          (ionChange)="onRepeatTypeChange()"
+          label="Repeat"
           labelPlacement="floating"
-          fill="outline" class="mt-3"
+          fill="outline"
+          class="mt-3"
         >
           <ion-select-option value="none">
             Never
           </ion-select-option>
+
           <ion-select-option value="daily">
             Daily
           </ion-select-option>
+
           <ion-select-option value="weekly">
             Weekly
           </ion-select-option>
         </ion-select>
-        <!-- weekly option -->
-        @if(form.get('repeat_type')?.value == 'weekly') {
+
+        <!-- Weekly repeat days -->
+        @if (form.get('repeat_type')?.value === 'weekly') {
           <div class="mt-3">
             @for (day of days; track day.value) {
               <ion-item>
@@ -75,11 +294,28 @@
             }
           </div>
         }
-        <!-- submit / cancel btn -->
+
+        <!-- Submit and cancel -->
         <div class="mt-3 d-flex justify-content-end gap-2 w-100">
-          <ion-button (click)="onCancel()" color="danger" fill="outline" type="button">Cancel</ion-button>
-          <ion-button color="primary" type="submit">Submit</ion-button>
+          <ion-button
+            type="button"
+            color="danger"
+            fill="outline"
+            [disabled]="saving"
+            (click)="onCancel()"
+          >
+            Cancel
+          </ion-button>
+
+          <ion-button
+            color="primary"
+            type="submit"
+            [disabled]="saving"
+          >
+            {{ saving ? 'Saving...' : 'Submit' }}
+          </ion-button>
         </div>
+
       </form>
     </ion-card-content>
   </ion-card>
